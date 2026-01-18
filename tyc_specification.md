@@ -1,5 +1,5 @@
 # TyC Programming Language Specification
-**Version 1.0 - January 2025**
+**Version 1.0 - January 2026**
 
 ## Table of Contents
 
