@@ -13,7 +13,7 @@ def emit(self):
     elif tk == self.ILLEGAL_ESCAPE:
         result = super().emit();
         raise IllegalEscape(result.text);
-    elif tk == self.ERROR_CHAR:
+    elif tk == self.ERROR_TOKEN:
         result = super().emit();
         raise ErrorToken(result.text); 
     else:
