@@ -252,7 +252,7 @@ class TyCParser ( Parser ):
                       "ASSIGN", "PLUS", "MINUS", "MULTIPLY", "DIVIDE", "MODULUS", 
                       "LESS_THAN", "GREATER_THAN", "LOGICAL_NOT", "MEMBER_ACCESS", 
                       "ID", "INTEGER_LITERAL", "FLOAT_LITERAL", "STRING_LITERAL", 
-                      "UNCLOSE_STRING", "ILLEGAL_ESCAPE", "ERROR_CHAR" ]
+                      "UNCLOSE_STRING", "ILLEGAL_ESCAPE", "ERROR_TOKEN" ]
 
     RULE_program = 0
     RULE_functionDeclaration = 1
@@ -360,7 +360,7 @@ class TyCParser ( Parser ):
     STRING_LITERAL=50
     UNCLOSE_STRING=51
     ILLEGAL_ESCAPE=52
-    ERROR_CHAR=53
+    ERROR_TOKEN=53
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)

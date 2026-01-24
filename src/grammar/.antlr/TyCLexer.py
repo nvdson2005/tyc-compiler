@@ -250,7 +250,7 @@ class TyCLexer(Lexer):
     STRING_LITERAL = 50
     UNCLOSE_STRING = 51
     ILLEGAL_ESCAPE = 52
-    ERROR_CHAR = 53
+    ERROR_TOKEN = 53
 
     channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN" ]
 
@@ -275,7 +275,7 @@ class TyCLexer(Lexer):
             "PLUS", "MINUS", "MULTIPLY", "DIVIDE", "MODULUS", "LESS_THAN", 
             "GREATER_THAN", "LOGICAL_NOT", "MEMBER_ACCESS", "ID", "INTEGER_LITERAL", 
             "FLOAT_LITERAL", "STRING_LITERAL", "UNCLOSE_STRING", "ILLEGAL_ESCAPE", 
-            "ERROR_CHAR" ]
+            "ERROR_TOKEN" ]
 
     ruleNames = [ "WS", "BLOCK_COMMENT", "LINE_COMMENT", "AUTO", "BREAK", 
                   "CASE", "CONTINUE", "DEFAULT", "ELSE", "FLOAT", "FOR", 
@@ -288,7 +288,7 @@ class TyCLexer(Lexer):
                   "MODULUS", "LESS_THAN", "GREATER_THAN", "LOGICAL_NOT", 
                   "MEMBER_ACCESS", "ID", "INTEGER_LITERAL", "FLOAT_LITERAL", 
                   "EXPONENT", "STRING_LITERAL", "STRING_CHAR", "ESCAPE_SEQUENCE", 
-                  "UNCLOSE_STRING", "ILLEGAL_ESCAPE", "ERROR_CHAR" ]
+                  "UNCLOSE_STRING", "ILLEGAL_ESCAPE", "ERROR_TOKEN" ]
 
     grammarFileName = "TyC.g4"
 

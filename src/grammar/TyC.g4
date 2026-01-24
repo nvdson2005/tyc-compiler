@@ -268,4 +268,4 @@ UNCLOSE_STRING: '"' STRING_CHAR* ([\r\n] | EOF);
 
 ILLEGAL_ESCAPE: '"' STRING_CHAR* '\\' ~[bfnrt"\\];
 
-ERROR_CHAR: .;
+ERROR_TOKEN: . ;
