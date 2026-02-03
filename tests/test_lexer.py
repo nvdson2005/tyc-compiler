@@ -5,13 +5,6 @@ Lexer test cases for TyC compiler
 import pytest
 from tests.utils import Tokenizer
 
-def test_keyword_auto():
-    """Test 'auto' keyword recognition"""
-    tokenizer = Tokenizer("auto")
-    result = tokenizer.get_tokens_as_string()
-    assert result == "AUTO,auto,EOF"
-
-
 def test_keyword_break():
     """Test 'break' keyword recognition"""
     tokenizer = Tokenizer("break")
@@ -150,13 +143,6 @@ def test_operator_modulus():
     tokenizer = Tokenizer("%")
     result = tokenizer.get_tokens_as_string()
     assert result == "MODULUS,%,EOF"
-
-
-def test_operator_assign():
-    """Test '=' operator"""
-    tokenizer = Tokenizer("=")
-    result = tokenizer.get_tokens_as_string()
-    assert result == "ASSIGN,=,EOF"
 
 
 def test_operator_equal():
@@ -309,13 +295,6 @@ def test_separator_colon():
 
 
 
-def test_identifier_simple():
-    """Test simple identifier"""
-    tokenizer = Tokenizer("myVar")
-    result = tokenizer.get_tokens_as_string()
-    assert result == "ID,myVar,EOF"
-
-
 def test_identifier_underscore_start():
     """Test identifier starting with underscore"""
     tokenizer = Tokenizer("_private")
@@ -401,13 +380,6 @@ def test_integer_large():
     assert result == "INTEGER_LITERAL,9999999,EOF"
 
 
-def test_integer_single_digit():
-    """Test single digit integer"""
-    tokenizer = Tokenizer("7")
-    result = tokenizer.get_tokens_as_string()
-    assert result == "INTEGER_LITERAL,7,EOF"
-
-
 def test_integer_leading_zeros():
     """Test integer with leading zeros (treated as separate tokens or one)"""
     tokenizer = Tokenizer("007")
@@ -420,13 +392,6 @@ def test_integer_sequence():
     tokenizer = Tokenizer("1 2 3")
     result = tokenizer.get_tokens_as_string()
     assert result == "INTEGER_LITERAL,1,INTEGER_LITERAL,2,INTEGER_LITERAL,3,EOF"
-
-
-def test_integer_in_expression():
-    """Test integer in expression context"""
-    tokenizer = Tokenizer("10+20")
-    result = tokenizer.get_tokens_as_string()
-    assert result == "INTEGER_LITERAL,10,PLUS,+,INTEGER_LITERAL,20,EOF"
 
 
 def test_integer_negative_sign_separate():
@@ -513,13 +478,6 @@ def test_float_multiple():
 # =============================================================================
 # STRING LITERAL TESTS (10 tests)
 # =============================================================================
-
-def test_string_simple():
-    """Test simple string literal"""
-    tokenizer = Tokenizer('"hello"')
-    result = tokenizer.get_tokens_as_string()
-    assert result == "STRING_LITERAL,hello,EOF"
-
 
 def test_string_empty():
     """Test empty string literal"""
@@ -806,3 +764,62 @@ def test_all_separators():
     tokenizer = Tokenizer("( ) { } [ ] ; , :")
     result = tokenizer.get_tokens_as_string()
     assert result == "LEFT_PAREN,(,RIGHT_PAREN,),LEFT_BRACE,{,RIGHT_BRACE,},LEFT_SQUARE_BRACKET,[,RIGHT_SQUARE_BRACKET,],SEMICOLON,;,COMMA,,,COLON,:,EOF"
+# ========== Simple Test Cases (10 types) ==========
+def test_keyword_auto():
+    """1. Keyword"""
+    tokenizer = Tokenizer("auto")
+    assert tokenizer.get_tokens_as_string() == "auto,<EOF>"
+
+
+def test_operator_assign():
+    """2. Operator"""
+    tokenizer = Tokenizer("=")
+    assert tokenizer.get_tokens_as_string() == "=,<EOF>"
+
+
+def test_separator_semi():
+    """3. Separator"""
+    tokenizer = Tokenizer(";")
+    assert tokenizer.get_tokens_as_string() == ";,<EOF>"
+
+
+def test_integer_single_digit():
+    """4. Integer literal"""
+    tokenizer = Tokenizer("5")
+    assert tokenizer.get_tokens_as_string() == "5,<EOF>"
+
+
+def test_float_decimal():
+    """5. Float literal"""
+    tokenizer = Tokenizer("3.14")
+    assert tokenizer.get_tokens_as_string() == "3.14,<EOF>"
+
+
+def test_string_simple():
+    """6. String literal"""
+    tokenizer = Tokenizer('"hello"')
+    assert tokenizer.get_tokens_as_string() == "hello,<EOF>"
+
+
+def test_identifier_simple():
+    """7. Identifier"""
+    tokenizer = Tokenizer("x")
+    assert tokenizer.get_tokens_as_string() == "x,<EOF>"
+
+
+def test_line_comment():
+    """8. Line comment"""
+    tokenizer = Tokenizer("// This is a comment")
+    assert tokenizer.get_tokens_as_string() == "<EOF>"
+
+
+def test_integer_in_expression():
+    """9. Mixed: integers and operator"""
+    tokenizer = Tokenizer("5+10")
+    assert tokenizer.get_tokens_as_string() == "5,+,10,<EOF>"
+
+
+def test_complex_expression():
+    """10. Complex: variable declaration"""
+    tokenizer = Tokenizer("auto x = 5 + 3 * 2;")
+    assert tokenizer.get_tokens_as_string() == "auto,x,=,5,+,3,*,2,;,<EOF>"
