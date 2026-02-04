@@ -6,969 +6,600 @@ TODO: Implement 100 test cases for parser
 import pytest
 from tests.utils import Parser
 
-
+# ========== Simple Test Cases (10 types) ==========
 def test_empty_program():
-    """Test empty program"""
-    parser = Parser("")
-    result = parser.parse()
-    assert result == "success"
+    """1. Empty program"""
+    assert Parser("").parse() == "success"
 
 
-def test_program_with_comment_only():
-    """Test program with only comment"""
-    parser = Parser("// just a comment")
-    result = parser.parse()
-    assert result == "success"
+def test_program_with_only_main():
+    """2. Program with only main function"""
+    assert Parser("void main() {}").parse() == "success"
 
 
-def test_program_with_block_comment():
-    """Test program with block comment"""
-    parser = Parser("/* block comment */")
-    result = parser.parse()
-    assert result == "success"
+def test_struct_simple():
+    """3. Struct declaration"""
+    source = "struct Point { int x; int y; };"
+    assert Parser(source).parse() == "success"
 
 
-def test_program_single_function():
-    """Test program with single function"""
-    parser = Parser("void main() {}")
-    result = parser.parse()
-    assert result == "success"
+def test_function_no_params():
+    """4. Function with no parameters"""
+    source = "void greet() { printString(\"Hello\"); }"
+    assert Parser(source).parse() == "success"
 
 
-def test_program_multiple_functions():
-    """Test program with multiple functions"""
-    source = """
-    int add(int x, int y) { return x + y; }
-    void main() { int z = add(1, 2); }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_var_decl_auto_with_init():
+    """5. Variable declaration"""
+    source = "void main() { auto x = 5; }"
+    assert Parser(source).parse() == "success"
 
-
-def test_function_void_no_params():
-    """Test void function with no parameters"""
-    parser = Parser("void main() {}")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_function_int_return():
-    """Test function with int return type"""
-    parser = Parser("int getValue() { return 42; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_function_float_return():
-    """Test function with float return type"""
-    parser = Parser("float getPI() { return 3.14; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_function_string_return():
-    """Test function with string return type"""
-    parser = Parser('string getMessage() { return "hello"; }')
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_function_single_param():
-    """Test function with single parameter"""
-    parser = Parser("void print(int x) {}")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_function_multiple_params():
-    """Test function with multiple parameters"""
-    parser = Parser("int add(int x, int y, int z) { return x + y + z; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_function_mixed_param_types():
-    """Test function with mixed parameter types"""
-    parser = Parser("void process(int a, float b, string c) {}")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_function_inferred_return():
-    """Test function with inferred return type"""
-    parser = Parser("add(int x, int y) { return x + y; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_function_struct_return():
-    """Test function with struct return type"""
-    source = """
-    struct Point { int x; int y; };
-    Point getOrigin() { return p; }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_function_struct_param():
-    """Test function with struct parameter"""
-    source = """
-    struct Point { int x; int y; };
-    void printPoint(Point p) {}
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_function_empty_body():
-    """Test function with empty body"""
-    parser = Parser("void doNothing() {}")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_function_nested_blocks():
-    """Test function with nested blocks"""
-    source = """
-    void test() {
-        {
-            { int x = 1; }
-        }
-    }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_struct_single_member():
-    """Test struct with single member"""
-    parser = Parser("struct Point { int x; };")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_struct_multiple_members():
-    """Test struct with multiple members"""
-    parser = Parser("struct Point { int x; int y; };")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_struct_mixed_types():
-    """Test struct with mixed member types"""
-    parser = Parser("struct Person { string name; int age; float height; };")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_struct_empty():
-    """Test struct with no members"""
-    parser = Parser("struct Empty { };")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_struct_with_struct_member():
-    """Test struct with another struct as member"""
-    source = """
-    struct Point { int x; int y; };
-    struct Line { Point start; Point end; };
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_multiple_structs():
-    """Test multiple struct declarations"""
-    source = """
-    struct Point { int x; int y; };
-    struct Circle { Point center; int radius; };
-    struct Rectangle { Point topLeft; Point bottomRight; };
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_struct_and_function():
-    """Test struct and function together"""
-    source = """
-    struct Point { int x; int y; };
-    void main() { Point p; }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_struct_trailing_semicolon():
-    """Test struct member list with trailing semicolon"""
-    parser = Parser("struct Data { int a; int b; };")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_var_auto_with_init():
-    """Test auto variable with initialization"""
-    parser = Parser("void main() { auto x = 10; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_var_auto_without_init():
-    """Test auto variable without initialization"""
-    parser = Parser("void main() { auto x; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_var_int_with_init():
-    """Test int variable with initialization"""
-    parser = Parser("void main() { int x = 42; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_var_int_without_init():
-    """Test int variable without initialization"""
-    parser = Parser("void main() { int x; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_var_float_with_init():
-    """Test float variable with initialization"""
-    parser = Parser("void main() { float pi = 3.14; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_var_float_without_init():
-    """Test float variable without initialization"""
-    parser = Parser("void main() { float f; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_var_string_with_init():
-    """Test string variable with initialization"""
-    parser = Parser('void main() { string msg = "hello"; }')
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_var_string_without_init():
-    """Test string variable without initialization"""
-    parser = Parser("void main() { string s; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_var_struct_without_init():
-    """Test struct variable without initialization"""
-    source = """
-    struct Point { int x; int y; };
-    void main() { Point p; }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_var_struct_with_init():
-    """Test struct variable with initialization"""
-    source = """
-    struct Point { int x; int y; };
-    void main() { Point p = {10, 20}; }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_var_multiple_declarations():
-    """Test multiple variable declarations"""
-    source = """
-    void main() {
-        int x = 1;
-        int y = 2;
-        float z = 3.0;
-    }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_var_init_with_expression():
-    """Test variable initialization with expression"""
-    parser = Parser("void main() { int x = 1 + 2 * 3; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-# =============================================================================
-# EXPRESSION TESTS (18 tests)
-# =============================================================================
-
-def test_expr_integer_literal():
-    """Test integer literal expression"""
-    parser = Parser("void main() { 42; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_float_literal():
-    """Test float literal expression"""
-    parser = Parser("void main() { 3.14; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_string_literal():
-    """Test string literal expression"""
-    parser = Parser('void main() { "hello"; }')
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_identifier():
-    """Test identifier expression"""
-    parser = Parser("void main() { int x = 10; x; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_parenthesized():
-    """Test parenthesized expression"""
-    parser = Parser("void main() { (1 + 2); }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_addition():
-    """Test addition expression"""
-    parser = Parser("void main() { 1 + 2; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_subtraction():
-    """Test subtraction expression"""
-    parser = Parser("void main() { 5 - 3; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_multiplication():
-    """Test multiplication expression"""
-    parser = Parser("void main() { 4 * 5; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_division():
-    """Test division expression"""
-    parser = Parser("void main() { 10 / 2; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_modulus():
-    """Test modulus expression"""
-    parser = Parser("void main() { 10 % 3; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_comparison():
-    """Test comparison expressions"""
-    parser = Parser("void main() { 1 < 2; 2 > 1; 1 <= 2; 2 >= 1; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_equality():
-    """Test equality expressions"""
-    parser = Parser("void main() { 1 == 1; 1 != 2; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_logical_and():
-    """Test logical AND expression"""
-    parser = Parser("void main() { 1 && 1; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_logical_or():
-    """Test logical OR expression"""
-    parser = Parser("void main() { 0 || 1; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_logical_not():
-    """Test logical NOT expression"""
-    parser = Parser("void main() { !0; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_unary_minus():
-    """Test unary minus expression"""
-    parser = Parser("void main() { -5; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_unary_plus():
-    """Test unary plus expression"""
-    parser = Parser("void main() { +5; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_expr_complex():
-    """Test complex expression with precedence"""
-    parser = Parser("void main() { 1 + 2 * 3 - 4 / 2; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-# =============================================================================
-# INCREMENT/DECREMENT TESTS (6 tests)
-# =============================================================================
-
-def test_prefix_increment():
-    """Test prefix increment"""
-    parser = Parser("void main() { int x = 0; ++x; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_prefix_decrement():
-    """Test prefix decrement"""
-    parser = Parser("void main() { int x = 10; --x; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_postfix_increment():
-    """Test postfix increment"""
-    parser = Parser("void main() { int x = 0; x++; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_postfix_decrement():
-    """Test postfix decrement"""
-    parser = Parser("void main() { int x = 10; x--; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_increment_in_expression():
-    """Test increment in expression"""
-    parser = Parser("void main() { int x = 0; int y = ++x + 1; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_decrement_in_expression():
-    """Test decrement in expression"""
-    parser = Parser("void main() { int x = 10; int y = x-- - 1; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-# =============================================================================
-# ASSIGNMENT TESTS (6 tests)
-# =============================================================================
-
-def test_assignment_simple():
-    """Test simple assignment"""
-    parser = Parser("void main() { int x; x = 10; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_assignment_expression():
-    """Test assignment with expression"""
-    parser = Parser("void main() { int x; x = 1 + 2 * 3; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_assignment_chain():
-    """Test chained assignment (right associative)"""
-    parser = Parser("void main() { int x; int y; x = y = 10; }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_assignment_member():
-    """Test member assignment"""
-    source = """
-    struct Point { int x; int y; };
-    void main() { Point p; p.x = 10; }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_assignment_nested_member():
-    """Test nested member assignment"""
-    source = """
-    struct Point { int x; int y; };
-    struct Line { Point start; Point end; };
-    void main() { Line l; l.start.x = 10; }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_assignment_from_function():
-    """Test assignment from function call"""
-    source = """
-    int getValue() { return 42; }
-    void main() { int x; x = getValue(); }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-# =============================================================================
-# IF STATEMENT TESTS (6 tests)
-# =============================================================================
 
 def test_if_simple():
-    """Test simple if statement"""
-    parser = Parser("void main() { if (1) {} }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_if_with_block():
-    """Test if with block body"""
-    parser = Parser("void main() { if (x > 0) { int y = 1; } }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_if_else():
-    """Test if-else statement"""
-    parser = Parser("void main() { if (x > 0) { } else { } }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_if_else_nested():
-    """Test nested if-else statements"""
-    source = """
-    void main() {
-        if (x > 0) {
-            if (y > 0) { }
-        } else {
-            if (z > 0) { } else { }
-        }
-    }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_if_complex_condition():
-    """Test if with complex condition"""
-    parser = Parser("void main() { if (x > 0 && y < 10 || z == 5) { } }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_if_else_chain():
-    """Test if-else chain (else if pattern)"""
-    source = """
-    void main() {
-        if (x == 1) { }
-        else { if (x == 2) { } else { } }
-    }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+    """6. If statement"""
+    source = "void main() { if (1) printInt(1); }"
+    assert Parser(source).parse() == "success"
 
 
 def test_while_simple():
-    """Test simple while statement"""
-    parser = Parser("void main() { while (1) {} }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_while_with_body():
-    """Test while with body"""
-    parser = Parser("void main() { int i = 0; while (i < 10) { ++i; } }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_while_nested():
-    """Test nested while loops"""
-    source = """
-    void main() {
-        int i = 0;
-        while (i < 10) {
-            int j = 0;
-            while (j < 10) {
-                ++j;
-            }
-            ++i;
-        }
-    }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_while_with_break_continue():
-    """Test while with break and continue"""
-    source = """
-    void main() {
-        int i = 0;
-        while (i < 100) {
-            if (i == 50) { break; }
-            if (i % 2 == 0) { continue; }
-            ++i;
-        }
-    }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+    """7. While statement"""
+    source = "void main() { while (1) printInt(1); }"
+    assert Parser(source).parse() == "success"
 
 
 def test_for_simple():
-    """Test simple for statement"""
-    parser = Parser("void main() { for (int i = 0; i < 10; ++i) {} }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_for_empty_parts():
-    """Test for with empty parts"""
-    parser = Parser("void main() { for (;;) { break; } }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_for_without_init():
-    """Test for without init"""
-    parser = Parser("void main() { int i = 0; for (; i < 10; ++i) {} }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_for_without_update():
-    """Test for without update"""
-    parser = Parser("void main() { for (int i = 0; i < 10;) { ++i; } }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_for_with_assignment_init():
-    """Test for with assignment as init"""
-    parser = Parser("void main() { int i; for (i = 0; i < 10; ++i) {} }")
-    result = parser.parse()
-    assert result == "success"
-
-
-def test_for_nested():
-    """Test nested for loops"""
-    source = """
-    void main() {
-        for (int i = 0; i < 10; ++i) {
-            for (int j = 0; j < 10; ++j) {
-            }
-        }
-    }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+    """8. For statement"""
+    source = "void main() { for (auto i = 0; i < 10; ++i) printInt(i); }"
+    assert Parser(source).parse() == "success"
 
 
 def test_switch_simple():
-    """Test simple switch statement"""
-    source = """
-    void main() {
-        int x = 1;
-        switch (x) {
-            case 1: break;
-        }
-    }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+    """9. Switch statement"""
+    source = "void main() { switch (1) { case 1: printInt(1); break; } }"
+    assert Parser(source).parse() == "success"
 
 
-def test_switch_multiple_cases():
-    """Test switch with multiple cases"""
-    source = """
-    void main() {
-        int x = 2;
-        switch (x) {
-            case 1: break;
-            case 2: break;
-            case 3: break;
-        }
-    }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_assignment_simple():
+    """10. Assignment statement"""
+    source = "void main() { int x; x = 5; }"
+    assert Parser(source).parse() == "success"
 
 
-def test_switch_with_default():
-    """Test switch with default"""
-    source = """
-    void main() {
-        int x = 5;
-        switch (x) {
-            case 1: break;
-            default: break;
-        }
-    }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_11():
+    """11. Empty struct"""
+    source = "struct Empty { };"
+    assert Parser(source).parse() == "success"
 
 
-def test_switch_fallthrough():
-    """Test switch with fallthrough (no break)"""
-    source = """
-    void main() {
-        int x = 1;
-        switch (x) {
-            case 1:
-            case 2:
-                break;
-        }
-    }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_12():
+    """12. Struct with members"""
+    source = "struct Pair { int x; float y; string s; };"
+    assert Parser(source).parse() == "success"
 
 
-def test_switch_case_with_statements():
-    """Test switch case with multiple statements"""
-    source = """
-    void main() {
-        int x = 1;
-        switch (x) {
-            case 1:
-                int y = 10;
-                y = y + 1;
-                break;
-        }
-    }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_13():
+    """13. Inferred return type function"""
+    source = "add(int a, int b) { return a + b; }"
+    assert Parser(source).parse() == "success"
 
 
-def test_switch_empty():
-    """Test empty switch statement"""
-    parser = Parser("void main() { int x = 1; switch (x) {} }")
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_14():
+    """14. Explicit return type function"""
+    source = "int add(int a, int b) { return a + b; }"
+    assert Parser(source).parse() == "success"
 
 
-def test_return_void():
-    """Test return without value (void)"""
-    parser = Parser("void main() { return; }")
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_15():
+    """15. Nested blocks"""
+    source = "void main() { { { } } }"
+    assert Parser(source).parse() == "success"
 
 
-def test_return_value():
-    """Test return with value"""
-    parser = Parser("int getValue() { return 42; }")
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_16():
+    """16. If-else with blocks"""
+    source = "void main() { if (1) { auto x = 1; } else { auto y = 2; } }"
+    assert Parser(source).parse() == "success"
 
 
-def test_return_expression():
-    """Test return with expression"""
-    parser = Parser("int compute() { return 1 + 2 * 3; }")
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_17():
+    """17. While with block"""
+    source = "void main() { while (1) { auto x = 0; } }"
+    assert Parser(source).parse() == "success"
 
 
-def test_return_function_call():
-    """Test return with function call"""
-    source = """
-    int getValue() { return 42; }
-    int wrapper() { return getValue(); }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_18():
+    """18. For with declaration init"""
+    source = "void main() { for (auto i = 0; i < 10; ++i) { } }"
+    assert Parser(source).parse() == "success"
 
 
-def test_function_call_no_args():
-    """Test function call with no arguments"""
-    source = """
-    void doSomething() {}
-    void main() { doSomething(); }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_19():
+    """19. For with assignment init"""
+    source = "void main() { for (i = 0; i < 10; i = i + 1) { } }"
+    assert Parser(source).parse() == "success"
 
 
-def test_function_call_single_arg():
-    """Test function call with single argument"""
-    source = """
-    void print(int x) {}
-    void main() { print(42); }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_20():
+    """20. For with empty parts"""
+    source = "void main() { for (; ; ) { break; } }"
+    assert Parser(source).parse() == "success"
 
 
-def test_function_call_multiple_args():
-    """Test function call with multiple arguments"""
-    source = """
-    int add(int x, int y, int z) { return x + y + z; }
-    void main() { int result = add(1, 2, 3); }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_21():
+    """21. Switch with case and default"""
+    source = "void main() { switch (1) { case 1: break; default: break; } }"
+    assert Parser(source).parse() == "success"
 
 
-def test_function_call_expression_args():
-    """Test function call with expression arguments"""
-    source = """
-    int add(int x, int y) { return x + y; }
-    void main() { int result = add(1 + 2, 3 * 4); }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_22():
+    """22. Switch with multiple cases"""
+    source = "void main() { switch (1) { case 1: case 2: break; } }"
+    assert Parser(source).parse() == "success"
 
 
-def test_function_call_nested():
-    """Test nested function calls"""
-    source = """
-    int f(int x) { return x + 1; }
-    int g(int x) { return x * 2; }
-    void main() { int result = f(g(5)); }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_23():
+    """23. Return without expr"""
+    source = "void main() { return; }"
+    assert Parser(source).parse() == "success"
 
 
-def test_member_access_simple():
-    """Test simple member access"""
-    source = """
-    struct Point { int x; int y; };
-    void main() { Point p; int val = p.x; }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_24():
+    """24. Return with expr"""
+    source = "int main() { return 1; }"
+    assert Parser(source).parse() == "success"
 
 
-def test_member_access_chain():
-    """Test chained member access"""
-    source = """
-    struct Point { int x; int y; };
-    struct Line { Point start; Point end; };
-    void main() { Line l; int val = l.start.x; }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_25():
+    """25. Break statement"""
+    source = "void main() { break; }"
+    assert Parser(source).parse() == "success"
 
 
-def test_member_access_in_expression():
-    """Test member access in expression"""
-    source = """
-    struct Point { int x; int y; };
-    void main() { Point p; int sum = p.x + p.y; }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_26():
+    """26. Continue statement"""
+    source = "void main() { continue; }"
+    assert Parser(source).parse() == "success"
 
 
-def test_member_increment():
-    """Test member increment"""
-    source = """
-    struct Counter { int value; };
-    void main() { Counter c; c.value++; ++c.value; }
-    """
-    parser = Parser(source)
-    result = parser.parse()
-    assert result == "success"
+def test_parser_case_27():
+    """27. Expression statement call"""
+    source = "void main() { printInt(1); }"
+    assert Parser(source).parse() == "success"
 
 
-def test_error_missing_semicolon():
-    """Test syntax error: missing semicolon"""
-    parser = Parser("void main() { int x = 10 }")
-    result = parser.parse()
-    assert result != "success"
+def test_parser_case_28():
+    """28. Assignment to member"""
+    source = "void main() { a.b = 5; }"
+    assert Parser(source).parse() == "success"
 
 
-def test_error_missing_brace():
-    """Test syntax error: missing closing brace"""
-    parser = Parser("void main() { int x = 10;")
-    result = parser.parse()
-    assert result != "success"
+def test_parser_case_29():
+    """29. Chained assignment"""
+    source = "void main() { a = b = c; }"
+    assert Parser(source).parse() == "success"
 
 
-def test_error_missing_paren():
-    """Test syntax error: missing parenthesis"""
-    parser = Parser("void main( { }")
-    result = parser.parse()
-    assert result != "success"
+def test_parser_case_30():
+    """30. Unary plus/minus"""
+    source = "void main() { auto x = -1 + +2; }"
+    assert Parser(source).parse() == "success"
 
 
-def test_error_invalid_expression():
-    """Test syntax error: invalid expression"""
-    parser = Parser("void main() { int x = ; }")
-    result = parser.parse()
-    assert result != "success"
+def test_parser_case_31():
+    """31. Prefix increment"""
+    source = "void main() { auto x = ++i; }"
+    assert Parser(source).parse() == "success"
 
 
-def test_error_invalid_statement():
-    """Test syntax error: invalid statement"""
-    parser = Parser("void main() { int; }")
-    result = parser.parse()
-    assert result != "success"
+def test_parser_case_32():
+    """32. Postfix increment"""
+    source = "void main() { auto x = i++; }"
+    assert Parser(source).parse() == "success"
 
 
-def test_error_missing_function_body():
-    """Test syntax error: missing function body"""
-    parser = Parser("void main()")
-    result = parser.parse()
-    assert result != "success"
+def test_parser_case_33():
+    """33. Prefix decrement"""
+    source = "void main() { auto x = --i; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_34():
+    """34. Postfix decrement"""
+    source = "void main() { auto x = i--; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_35():
+    """35. Logical and/or precedence"""
+    source = "void main() { auto x = 1 && 2 || 3; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_36():
+    """36. Equality expression"""
+    source = "void main() { auto x = 1 == 2; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_37():
+    """37. Relational expression"""
+    source = "void main() { auto x = 1 < 2; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_38():
+    """38. Additive expression"""
+    source = "void main() { auto x = 1 + 2 - 3; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_39():
+    """39. Multiplicative expression"""
+    source = "void main() { auto x = 1 * 2 / 3 % 4; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_40():
+    """40. Parenthesized expression"""
+    source = "void main() { auto x = (1 + 2) * 3; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_41():
+    """41. Member access chain"""
+    source = "void main() { auto x = a.b.c; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_42():
+    """42. Call then member"""
+    source = "void main() { auto x = a(1).b; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_43():
+    """43. Chained calls"""
+    source = "void main() { auto x = a(1)(2); }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_44():
+    """44. Struct init literal"""
+    source = "void main() { auto x = {1, 2, 3}; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_45():
+    """45. Struct type variable init"""
+    source = "struct Point { int x; int y; }; void main() { Point p = {1,2}; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_46():
+    """46. Nested struct init"""
+    source = "void main() { auto p = { {1,2}, 3 }; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_47():
+    """47. String literal expression"""
+    source = "void main() { auto x = \"hello\"; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_48():
+    """48. Float literal expression"""
+    source = "void main() { auto x = 1e3; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_49():
+    """49. Variable declaration without init"""
+    source = "void main() { int x; float y; string s; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_50():
+    """50. Multiple statements"""
+    source = "void main() { int x; x = 1; x = x + 1; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_51():
+    """51. If without else"""
+    source = "void main() { if (1) return; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_52():
+    """52. While with single statement"""
+    source = "void main() { while (1) return; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_53():
+    """53. For with update expression"""
+    source = "void main() { for (auto i = 0; i < 10; i = i + 1) { } }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_54():
+    """54. Switch with empty body"""
+    source = "void main() { switch (x) { } }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_55():
+    """55. Switch fallthrough"""
+    source = "void main() { switch (x) { case 1: case 2: return; } }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_56():
+    """56. Logical not"""
+    source = "void main() { auto x = !(!1); }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_57():
+    """57. Comparison chain"""
+    source = "void main() { auto x = 1 < 2 == 3 != 4; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_58():
+    """58. Modulus"""
+    source = "void main() { auto x = 5 % 2; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_59():
+    """59. Function call in expression"""
+    source = "void main() { auto x = add(1,2); }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_60():
+    """60. Struct type variable decl"""
+    source = "struct S { int x; }; void main() { S s; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_61():
+    """61. Multiple functions"""
+    source = "int f() { return 1; } void main() { auto x = f(); }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_62():
+    """62. Assignment expression in parens"""
+    source = "void main() { auto x = (a = 1); }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_63():
+    """63. Complex expression"""
+    source = "void main() { auto x = (a(1) + b(2)) * c(3); }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_64():
+    """64. Empty struct init"""
+    source = "void main() { auto x = { }; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_65():
+    """65. Single element struct init"""
+    source = "void main() { auto x = {1}; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_66():
+    """66. Nested struct init"""
+    source = "void main() { auto x = {1, {2,3}}; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_67():
+    """67. Multiple nested struct init"""
+    source = "void main() { auto x = { {1}, {2} }; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_68():
+    """68. Call with no args"""
+    source = "void main() { foo(); }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_69():
+    """69. If-else dangling"""
+    source = "void main() { if (1) if (0) return; else return; }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_70():
+    """70. Switch case with block"""
+    source = "void main() { switch (x) { case 1: { auto y = 2; } } }"
+    assert Parser(source).parse() == "success"
+
+
+def test_parser_case_71():
+    """71. Missing semicolon"""
+    source = "void main() { int x }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_72():
+    """72. Missing right paren"""
+    source = "void main( { }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_73():
+    """73. Missing left paren"""
+    source = "void main) { }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_74():
+    """74. Missing right brace"""
+    source = "void main() {"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_75():
+    """75. Var decl missing semicolon"""
+    source = "void main() { auto x = 1 }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_76():
+    """76. Invalid parameter auto"""
+    source = "void f(auto x) { }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_77():
+    """77. Invalid struct member auto"""
+    source = "struct S { auto x; };"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_78():
+    """78. Missing colon in case"""
+    source = "void main() { switch (1) { case 1 break; } }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_79():
+    """79. Missing colon in default"""
+    source = "void main() { switch (1) { default break; } }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_80():
+    """80. Return missing semicolon"""
+    source = "void main() { return }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_81():
+    """81. Break missing semicolon"""
+    source = "void main() { break }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_82():
+    """82. Continue missing semicolon"""
+    source = "void main() { continue }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_83():
+    """83. For missing semicolons"""
+    source = "void main() { for (auto i = 0 i < 10 i++) { } }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_84():
+    """84. For missing right paren"""
+    source = "void main() { for (auto i = 0; i < 10; i++ { } }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_85():
+    """85. If missing right paren"""
+    source = "void main() { if (1 return; }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_86():
+    """86. While missing right paren"""
+    source = "void main() { while (1 return; }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_87():
+    """87. Switch missing right brace"""
+    source = "void main() { switch (1) { case 1: break; }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_88():
+    """88. Assignment missing rhs"""
+    source = "void main() { a = ; }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_89():
+    """89. Trailing operator"""
+    source = "void main() { auto x = 1 + ; }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_90():
+    """90. Function missing block"""
+    source = "void main();"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_91():
+    """91. Struct missing semicolon"""
+    source = "struct S { int x; }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_92():
+    """92. Struct missing closing brace"""
+    source = "struct S { int x; "
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_93():
+    """93. Var decl missing id"""
+    source = "void main() { int ; }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_94():
+    """94. Param missing id"""
+    source = "void f(int) { }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_95():
+    """95. Missing right paren in params"""
+    source = "void f(int a, int b { }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_96():
+    """96. Empty parameter with comma"""
+    source = "void f(int a,) { }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_97():
+    """97. Case missing expression"""
+    source = "void main() { switch (1) { case : break; } }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_98():
+    """98. Invalid token in program"""
+    source = "@"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_99():
+    """99. Else without if"""
+    source = "void main() { else return; }"
+    assert Parser(source).parse() != "success"
+
+
+def test_parser_case_100():
+    """100. Empty statement"""
+    source = "void main() { ; }"
+    assert Parser(source).parse() != "success"
