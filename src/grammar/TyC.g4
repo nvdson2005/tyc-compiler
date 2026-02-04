@@ -28,11 +28,7 @@ options {
  */
 
 // PROGRAM STRUCTURE
-program:
-	mainFunction? (structDeclaration | functionDeclaration)* EOF;
-
-// FUNCTION SECTION ENTRY POINT
-mainFunction: VOID 'main' LEFT_PAREN RIGHT_PAREN block;
+program: (structDeclaration | functionDeclaration)* EOF;
 
 functionDeclaration:
 	returnType ID LEFT_PAREN parameterList RIGHT_PAREN block // explicit return type
@@ -135,6 +131,7 @@ primaryExpression:
 	| INTEGER_LITERAL
 	| FLOAT_LITERAL
 	| STRING_LITERAL
+	| structInit
 	| LEFT_PAREN expression RIGHT_PAREN;
 
 // STATEMENT SECTION
@@ -170,18 +167,16 @@ whileStatement:
 forStatement:
 	FOR LEFT_PAREN forInit? SEMICOLON expression? SEMICOLON forUpdate? RIGHT_PAREN statement;
 
-forInit: variableDeclaration;
+forInit:
+    variableDeclaration
+    | expression;
 
 forUpdate: expression;
 
-switchStatement
-    : SWITCH LEFT_PAREN expression RIGHT_PAREN LEFT_BRACE switchClause* RIGHT_BRACE
-    ;
+switchStatement:
+	SWITCH LEFT_PAREN expression RIGHT_PAREN LEFT_BRACE switchClause* RIGHT_BRACE;
 
-switchClause
-    : caseClause
-    | defaultClause
-    ;
+switchClause: caseClause | defaultClause;
 
 caseClause: CASE expression COLON statement*;
 
@@ -276,6 +271,6 @@ fragment ESCAPE_SEQUENCE:
 	'\\' [bfnrt"\\]; // valid escape sequences: \b \f \n \r \t \" \\
 
 // Error handling tokens
-ILLEGAL_ESCAPE: '"' STRING_CHAR* '\\' ~[bfnrt"\\];
+ILLEGAL_ESCAPE: '"' STRING_CHAR* '\\' ~[bfnrt"\\\r\n];
 UNCLOSE_STRING: '"' STRING_CHAR* ([\r\n] | EOF);
 ERROR_TOKEN: .;
